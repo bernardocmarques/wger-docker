@@ -6,12 +6,12 @@ on:
       - master
       - main
     paths:
-      - 'config/nginx.conf'
+      - 'config/nginx/**'
       - 'tests/**'
       - '.github/workflows/test-nginx.yml'
   pull_request:
     paths:
-      - 'config/nginx.conf'
+      - 'config/nginx/**'
       - 'tests/**'
       - '.github/workflows/test-nginx.yml'
 
@@ -27,7 +27,7 @@ jobs:
         run: |
           docker run --rm \
             --add-host=web:127.0.0.1 \
-            --volume ${{ github.workspace }}/config/nginx.conf:/etc/nginx/conf.d/default.conf:ro \
+            --volume ${{ github.workspace }}/config/nginx:/etc/nginx/conf.d:ro \
             nginx:alpine nginx -t
 
   test-configuration:
