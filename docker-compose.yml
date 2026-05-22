@@ -1,5 +1,5 @@
 #
-# Configured for Cloudflare Tunnels deployment - The web service is exposed
+# Configured for Cloudflare Tunnels deployment - The nginx service is exposed
 # on port 8001 for the tunnel to connect to
 
 services:
@@ -15,8 +15,8 @@ services:
     volumes:
       - static:/home/wger/static
       - media:/home/wger/media
-    ports:
-      - "8001:8000"
+    expose:
+      - 8000
     logging:
       driver: json-file
       options:
@@ -78,6 +78,30 @@ services:
     # You probably want to limit the memory usage of the cache, otherwise it might
     # hog all the available memory. Remove or change according to your needs.
     #mem_limit: 5gb
+
+  nginx:
+    image: docker.io/nginx:stable-alpine
+    depends_on:
+      web:
+        condition: service_healthy
+    ports:
+      - "8001:80"
+    volumes:
+      - ./config/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - static:/wger/static:ro
+      - media:/wger/media:ro
+    logging:
+      driver: json-file
+      options:
+        max-size: 5m
+        max-file: 5
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
 
   celery_worker:
     image: docker.io/wger/server:latest
