@@ -87,7 +87,7 @@ services:
     ports:
       - "8001:80"
     volumes:
-      - ./config/nginx:/etc/nginx/conf.d:ro
+      - /home/labrac/wger-config:/etc/nginx/conf.d:ro
       - static:/wger/static:ro
       - media:/wger/media:ro
     logging:
